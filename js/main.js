@@ -110,7 +110,7 @@ var UiController = (function(){
 
 				type: document.querySelector("#type").value,
 				description: document.querySelector("#description").value,
-				amount: document.querySelector("#amount").value
+				amount: parseFloat(document.querySelector("#amount").value)
 
 			}
 		},
@@ -197,17 +197,22 @@ var Controller = (function(UiController, BudgetController) {
 
 				input = UiController.getInput();
 
-				//crete new item and add to data structure
-				new_item = BudgetController.add_item(input.type, input.description, input.amount);
+				if(input.description !== "" && input.amount > 0) {
+
+					//crete new item and add to data structure
+				 new_item = BudgetController.add_item(input.type, input.description, input.amount);
 
 
-				//display item on ui
-				UiController.add_item(new_item, input.type);
+				 //display item on ui
+				 UiController.add_item(new_item, input.type);
 
 
-				//clear fields
+				 //clear fields
 
-				UiController.clear_fields();
+				 UiController.clear_fields();
+				}
+
+
 
 
 		}
@@ -242,8 +247,9 @@ var Controller = (function(UiController, BudgetController) {
 
 		//when user clicks the finish button
 
-		document.querySelector("#finish").addEventListener("click", function(){
+		document.querySelector("#finish").addEventListener("click", function(event){
 
+					event.preventDefault();
 						document.querySelector(".add_wrapper").classList.remove("active");
 
 		});
