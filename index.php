@@ -94,6 +94,8 @@
 
 					<div class="row">
 
+						<!--====  income section=======-->
+
 						<div class="col-md-6">
 
 							<h1 class="display-5">Income</h1>
@@ -116,6 +118,9 @@
 						</div>
 
 
+						<!--====  end income section=======-->
+
+						<!--====  expense section=======-->
 						<div class="col-md-6">
 
 							<h1 class="display-5">Expenditure</h1>
