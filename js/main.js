@@ -30,29 +30,60 @@ var BudgetController = (function(){
 
 		all_total: {
 
-			income_total: 0,
-			expense_total: 0
+			income: 0,
+			expense: 0,
+			balance: 0
 		}
-	}
+	};
 
+
+	
+
+	function  calculate(type) {
+
+		//console.log(type);
+		//console.log(data);
+		
+			var sum, ArrData;
+
+			sum = 0;
+
+			ArrData = data.all_data[type];
+
+			ArrData.forEach(function(curr){
+
+
+					sum  = sum + curr.amount;
+
+
+			});
+
+
+			data.all_total[type] = sum;
+
+			//console.log(sum);
+
+
+
+	}
 
 
 	return {
 
 
 
-			add_item: function(type, description, amount) {
+		add_item: function(type, description, amount) {
 
-				var id, new_item;
+			var id, new_item;
 
-				if(data.all_data[type].length > 0) {
+			if(data.all_data[type].length > 0) {
 
 				id = data.all_data[type][data.all_data[type].length -1].id + 1;
 
-				} else {
+			} else {
 
-					id  = 0 ;
-				}
+				id  = 0 ;
+			}
 
 				//if type is expense
 				if(type === 'expense') {
@@ -75,6 +106,70 @@ var BudgetController = (function(){
 				return new_item;
 			},
 
+
+			updateBudget: function() {
+
+				var balance;
+				//calculate totals
+				calculate('expense');
+				calculate("income");
+
+				//calculate balance
+
+				balance = data.all_total.income - data.all_total.expense;
+
+				data.all_total.balance = balance;
+
+			},
+
+
+			getTotals: function() {
+
+				return data.all_total;
+			},
+
+			getBudget: function() {
+
+
+				return {
+
+					income: data.all_total.income,
+					expense: data.all_total.expense,
+					balance: data.all_total.balance
+
+				}
+
+			} ,
+
+
+			removeItem: function(type, id) {
+
+				var ArrData, ids, newData, index;
+
+				ArrData = data.all_data[type];
+
+				//console.log(ArrData);
+
+				ids = ArrData.map(function(curr){
+
+						return curr.id; 
+				}); 
+
+
+				index = ids.indexOf(id);
+
+				if(index !== -1) {
+
+					data.all_data[type].splice(index, 1); 
+					
+				}
+
+
+
+
+			},
+
+
 			testing: function() {
 
 				console.log(data);
@@ -83,7 +178,7 @@ var BudgetController = (function(){
 
 
 
-	}
+		}
 	//console.log('we on it');
 })();
 
@@ -91,13 +186,13 @@ var BudgetController = (function(){
 
 //UI CONTROLLER
 
-var UiController = (function(){
+var UiController = (function() {
 
 	var dom_strings = {
 
-					type: "#type",
-					description: "#description",
-					amount: "#amount"
+		type: "#type",
+		description: "#description",
+		amount: "#amount"
 
 	};
 
@@ -117,26 +212,31 @@ var UiController = (function(){
 
 		add_item: function(obj, type) {
 
-				var html, element, new_html;
+			var html, element, new_html;
 
 				//create a placeholder text
 
-				html = '<tr><td>%description%</td><td>%amount%</td><td><a href="#"><i class="fa fa-trash" aria-hidden="true"></i></a></td></tr>';
+				html = '<tr id="%id%"><td>%description%</td><td>%amount%</td><td><a href="#"><i class="fa fa-trash" aria-hidden="true"></i></a></td></tr>';
+
+				id = type+"-"+obj.id;
 
 				if(type === "income") {
 
 					element = "#income";
+					
 
 				} else if(type === "expense") {
 
 					element = "#expense";
+
 				}
 
 
-					//replace placeholder text
+				//replace placeholder text
 				new_html = html.replace("%description%", obj.description);
 
 				new_html = new_html.replace("%amount%", obj.amount);
+				new_html = new_html.replace("%id%", id);
 
 				//add item to  ui
 				document.querySelector(element).insertAdjacentHTML('afterbegin', new_html);
@@ -145,9 +245,9 @@ var UiController = (function(){
 
 
 				//console.log(type);
-		},
+			},
 
-		clear_fields: function() {
+			clear_fields: function() {
 
 
 				var fields, array_fields;
@@ -159,7 +259,7 @@ var UiController = (function(){
 
 				array_fields.forEach(function(curr){
 
-							curr.value = "";
+					curr.value = "";
 
 				});
 
@@ -172,13 +272,51 @@ var UiController = (function(){
 
 				console.log("fields cleared");
 
-					*/
+				*/
+			},
+
+
+			displayBudget: function(obj) {
+
+
+				document.querySelector(".income").textContent = obj.income;
+				document.querySelector('.expense').textContent = obj.expense;
+				document.querySelector('.balance').textContent = obj.balance;
+
+
+			},
+
+			removeItem: function(type, id) {
+
+				var element, string;				
+				
+				//string ="#"+type+"-"+id;
+
+				//console.log(string);
+
+				
+				//get the element
+				element = document.querySelector("#"+type+"-"+id);
+
+				//remove element
+
+				element.parentNode.removeChild(element);
+
+				console.log(element);
+
+			
+
+				//remove item from data structure;
+
+			
+
+
+			}
+
+
 		}
 
-
-	}
-
-})();
+	})();
 //var Controller = ()();
 
 
@@ -189,33 +327,57 @@ var Controller = (function(UiController, BudgetController) {
 
 
 
-		function ctrl_add_item(event) {
+	function ctrl_add_item(event) {
 
-			event.preventDefault();
+		event.preventDefault();
 
-				var new_item, input;
+		var new_item, input;
 
-				input = UiController.getInput();
+		input = UiController.getInput();
 
-				if(input.description !== "" && input.amount > 0) {
+		if(input.description !== "" && input.amount > 0) {
 
-					//crete new item and add to data structure
-				 new_item = BudgetController.add_item(input.type, input.description, input.amount);
+				var totals, budget;
+
+				//crete new item and add to data structure
+				new_item = BudgetController.add_item(input.type, input.description, input.amount);
 
 
 				 //display item on ui
 				 UiController.add_item(new_item, input.type);
 
-
 				 //clear fields
-
 				 UiController.clear_fields();
+
+				 //update the budget controller
+
+				 BudgetController.updateBudget();
+				 //BudgetController.updateBudget(input.type, new_item);
+
+
+				 //getBudget and 
+
+				budget = BudgetController.getBudget();
+
+				//console.log(budget);
+
+				//display budget;
+				UiController.displayBudget(budget);
+
+				 //update totals in ui
+
+				 //UiController.updateTotals(totals);
+
+
+				 //console.log(totals);
+
+
 				}
 
 
 
 
-		}
+			};
 
 		//when add button is clicked
 
@@ -226,15 +388,13 @@ var Controller = (function(UiController, BudgetController) {
 			if(event.keyCode === 13) {
 
 
-			ctrl_add_item(event);
+				ctrl_add_item(event);
 
 			}
 		});
 
 
 		//when user clicks on the create button
-
-
 		document.querySelector("#create").addEventListener("click", function(){
 
 				//do something
@@ -242,16 +402,73 @@ var Controller = (function(UiController, BudgetController) {
 				//add active class to it
 				document.querySelector(".add_wrapper").classList.add("active");
 
-		});
+			});
 
 
 		//when user clicks the finish button
-
 		document.querySelector("#finish").addEventListener("click", function(event){
 
-					event.preventDefault();
-						document.querySelector(".add_wrapper").classList.remove("active");
+			event.preventDefault();
+			document.querySelector(".add_wrapper").classList.remove("active");
 
 		});
 
-})(UiController, BudgetController);
+
+		//when the delete button is clicked
+
+		document.querySelector(".budget-wrapper").addEventListener("click", function(event){
+
+			var itemId, newItemId,  id, budget, type; 
+			itemId = event.target.parentNode.parentNode.parentNode.id;
+
+
+			if(itemId) {
+
+				newItemId = itemId.split("-");
+
+				console.log(newItemId);
+
+				type = newItemId[0];
+				id = newItemId[1];
+
+				//remove item from data structure;
+
+				BudgetController.removeItem(type, parseInt(id));
+
+			
+
+				UiController.removeItem(type, id);
+
+				//update the budget;
+				BudgetController.updateBudget();
+
+				//get the budget;
+
+				budget = BudgetController.getBudget();
+
+				//display budget
+
+				UiController.displayBudget(budget); 
+
+			
+				
+			}
+
+		});
+
+
+		return {
+
+
+			testing: function() {
+
+				//set the total to zero
+				document.querySelector(".income").textContent = "No Income";
+				document.querySelector(".expense").textContent = "No Expense";
+			}
+		}
+
+	})(UiController, BudgetController);
+
+
+	Controller.testing();

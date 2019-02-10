@@ -36,12 +36,13 @@
 	<section id="interface">
 
 
-
-
 		<div class="container">
-			<h1 class="display-4 text-center">Budget Application</h1>
+			<h1 class="display-4 ">Budget Application</h1>
+			<p class="text">Total Income: <span class="income">4000</span></p>
+			<p class="text">Total Expense <span class="expense">4000</span></p>
+			<p class="text">Total Expenditure: <span class="balance">0</span></p>
 
-			<div class="row">
+			<div class="row" style="margin-top: 20px">
 
 
 				<!-- add item container -->
@@ -87,13 +88,14 @@
 					<!-- end add_item container -->
 			</div>
 
+
+
+
+
 			<!-- display area -->
-			<div class="row">
+			<div class="row budget-wrapper">
 
-				<div class="col-md-12">
-
-					<div class="row">
-
+		
 						<!--====  income section=======-->
 
 						<div class="col-md-6">
@@ -120,6 +122,9 @@
 
 						<!--====  end income section=======-->
 
+
+
+
 						<!--====  expense section=======-->
 						<div class="col-md-6">
 
@@ -144,7 +149,7 @@
 
 
 						</div>
-					</div>
+				
 
 
 
@@ -153,7 +158,7 @@
 
 
 
-			</div>
+		
 
 
 		<!-- end display area -->
